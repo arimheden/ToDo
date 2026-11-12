@@ -43,16 +43,21 @@ while (true)
 
         // Delete task from list
         case "4":
-            todoManager.DeleteTask(ref tasks);
+            todoManager.DeleteTask(tasks);
             break;
 
         // Edit task
         case "5":
-            todoManager.EditTask(ref tasks);
+            todoManager.EditTask(tasks);
+            break;
+
+        // Mark task as completed
+        case "6":
+            todoManager.CompleteTask(tasks);
             break;
 
         // Exit program
-        case "6":
+        case "7":
             todoManager.SaveTasks(tasks);
             Environment.Exit(0);
             break;

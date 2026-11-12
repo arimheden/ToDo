@@ -35,7 +35,6 @@ internal class TodoManager
         // Validate price
         if (validateType == "date")
         {
-            decimal price;
             if (DateTime.TryParse(inputToValidate, out DateTime date))
             {
                 if (date > DateTime.Now) return true;
@@ -73,7 +72,6 @@ internal class TodoManager
     public void AddTask(List<TodoItem> tasks)
     {
         Console.WriteLine();
-        int inputLine = 1;
         string todoProject = "";
         string todoTitle = "";
         DateTime todoDueDate = DateTime.Now;
@@ -150,9 +148,9 @@ internal class TodoManager
         Console.WriteLine();
         Console.WriteLine("===== To Do =====");
         Console.WriteLine();
-        foreach (TodoItem task in tasks.OrderBy(task => task.DueDate))
+        foreach (TodoItem task in tasks.OrderBy(task => task.Status).ThenBy(task => task.Project).ThenBy(task => task.DueDate))
         {
-            Console.WriteLine(task.Id.ToString().PadRight(5) + " | " + task.Project.PadRight(14) + " | " + task.Title.PadRight(20) + " | " + task.DueDate.ToString("yyyy-MM-dd").PadRight(12) + " | " + task.Status.ToString());
+            Console.WriteLine(task.Id.ToString().PadRight(5) + " | " + task.Project.PadRight(20) + " | " + task.Title.PadRight(20) + " | " + task.DueDate.ToString("yyyy-MM-dd").PadRight(12) + " | " + task.Status.ToString());
         }
     }
 
@@ -164,24 +162,29 @@ internal class TodoManager
         // Request user input
         string searchString = this.UserInput();
 
-        Console.WriteLine();
-        Console.WriteLine("FOUND TASKS:");
-        Console.WriteLine();
-
-        var taskQuery = from task in tasks where task.Project.ToLower().Contains(searchString.ToLower())
-                        || task.Title.ToLower().Contains(searchString.ToLower())
-                        select task;
-
-        foreach (TodoItem task in taskQuery) 
+        if (!String.IsNullOrEmpty(searchString))
         {
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine(task.Project.PadRight(12) + " | " + task.Title.PadRight(12) + " | " + task.DueDate.ToString().PadRight(12));
-            Console.ForegroundColor = ConsoleColor.Gray;
+
+            Console.WriteLine();
+            Console.WriteLine("FOUND TASKS:");
+            Console.WriteLine();
+
+            var taskQuery = from task in tasks
+                            where task.Project.ToLower().Contains(searchString.ToLower())
+                            || task.Title.ToLower().Contains(searchString.ToLower()) orderby task.Project, task.DueDate
+                            select task;
+
+            foreach (TodoItem task in taskQuery)
+            {
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine(task.Id.ToString().PadRight(5) + " | " + task.Project.PadRight(20) + " | " + task.Title.PadRight(20) + " | " + task.DueDate.ToString("yyyy-MM-dd").PadRight(12) + " | " + task.Status.ToString());
+                Console.ForegroundColor = ConsoleColor.Gray;
+            }
         }
     }
 
     // Delete task by Id
-    public void DeleteTask(ref List<TodoItem> tasks)
+    public void DeleteTask(List<TodoItem> tasks)
     {
 
         Console.Write("Delete Task: ");
@@ -211,8 +214,51 @@ internal class TodoManager
         }
     }
 
+    // Complete task
+    public void CompleteTask(List<TodoItem> tasks)
+    {
+
+        Console.Write("Complete Task: ");
+
+        // Request user input
+        string completeString = this.UserInput();
+
+        // Validate user input
+        try
+        {
+            this.ValidateInput(completeString, "id");
+            if (tasks.Any(task => task.Id == Convert.ToInt32(completeString)))
+            {
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine("Task has been conpleted!");
+                Console.ForegroundColor = ConsoleColor.Gray;
+                try
+                {
+                    foreach (TodoItem task in tasks.Where(w => w.Id == Convert.ToInt32(completeString)))
+                    {
+                        task.Status = Status.Completed;
+                    }
+                }
+                catch (Exception e)
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine(e.Message);
+                    Console.ForegroundColor = ConsoleColor.Gray;
+                }
+            }
+            else throw new ArgumentException("Task does not exist!");
+
+        }
+        catch (Exception e)
+        {
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine(e.Message);
+            Console.ForegroundColor = ConsoleColor.Gray;
+        }
+    }
+
     // Edit task by Id
-    public void EditTask(ref List<TodoItem> tasks)
+    public void EditTask(List<TodoItem> tasks)
     {
 
         Console.Write("Edit Task: ");
@@ -312,7 +358,9 @@ internal class TodoManager
             }
             catch (UnauthorizedAccessException e)
             {
-                Console.WriteLine("The application does not have the required permission to create `{0}`", "Data");
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine(e.Message);
+                Console.ForegroundColor = ConsoleColor.Gray;
                 return;
             }
         }
@@ -364,7 +412,8 @@ internal class TodoManager
         Console.WriteLine("3. Search Tasks");
         Console.WriteLine("4. Delete Task");
         Console.WriteLine("5. Edit Task");
-        Console.WriteLine("6. Exit");
+        Console.WriteLine("6. Complete Task");
+        Console.WriteLine("7. Exit");
         Console.WriteLine();
 
         ConsoleKeyInfo keypressed;
@@ -374,7 +423,7 @@ internal class TodoManager
             keypressed = Console.ReadKey(true);
             numKey = keypressed.Key.ToString().Trim('D');
 
-        } while (!Regex.IsMatch(numKey, @"^[1-9]+\z"));
+        } while (!Regex.IsMatch(numKey, @"^[1-7]+\z"));
         return numKey;
     }
 }
