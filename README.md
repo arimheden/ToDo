@@ -25,5 +25,5 @@ Enter the id number of a task to mark it as completed.
 ## 7. Exit
 Use this option to exit the application.
 
-The todo list will be saved in json format in the file tasks.json in a subfolder named Data in your application folder.
+The todo list will be saved in json format in the file **_tasks.json_** in a subfolder named **_Data_** in your application folder.
 When the application starts this file will be automatically loaded if it exists.
