@@ -1,22 +1,30 @@
-# Product inventory management
+# Todo List Manager
 
-This application lets you create and manage a list of products containing product category, product name and price.
+This application can be used to create and manage tasks in a todo list. When you start the application you will see its' main menu.
+To access the options in the menu, press the corresponding number key.
 
-Use the numbers on your keyboard to interact with the application's menu.
+## 1. Add Task
+Enter a project name for the task, a title and a due date. Press enter to save the task in your todo list.
 
-When selecting the Add Product option, you will be able to add any number of products by entering their information.
-Type the letter 'q' to exit this mode.
+## 2. View Tasks
+This will display your todo list ordered by project name and due date. Each task starts with a numeric id, which can be used to edit,
+delete or complete a task
 
-The View Products option will display the products you have currently entered in a table format. The first column
-contains each product's Id number.
+## 3. Search Tasks
+Enter any text to search for tasks in your todo list with matching project name or title.
 
-To delete or edit a product, you will need to enter it's Id number.
+## 4. Delete Task
+Enter the id number of a task you wish to delete from your list.
 
-The Save Products option will store your current products in json format in a file named products.json.
-You can load previously saved products from this file with the Load Products option. You can add more products
-to this file by using the Add Product option and then save the updated list using the Save Products option,
-which will overwrite any existing products.json file.
+## 5. Edit Task
+Enter the id number of a task you wish to edit and enter new details for the task. Just press enter to keep the existing value.
 
-The Statistics option will display information about the products you have currently entered or loaded.
+## 6. Complete Task
+Enter the id number of a task to mark it as completed.
 
-You can close the application with the Exit Program option.
+## 7. Exit
+Use this option to exit the application.
+
+The todo list will be saved in json format in the file **_tasks.json_** in a subfolder named **_Data_** in your application folder.
+When the application starts this file will be automatically loaded if it exists.
+
